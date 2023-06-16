@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import $ from "jquery";
-import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { io } from "socket.io-client";
@@ -12,10 +10,7 @@ class Calendar extends Component {
   {
     super(props)
 
-   
-
     this.state = {
-     
       events:[]
     };
     
@@ -23,62 +18,10 @@ class Calendar extends Component {
   }
   
   componentDidMount(){
-
-    const socket = io(`ws://${window.location.href.split('//')[1].split('/')[0]}`);
-
-    socket.on("broadcast", msg => {
-       // alert(msg);
-        var d = [];
-        var m = [];
-        
-        try{
-        d = JSON.parse(msg);
-
-        d.forEach(element => {
-         var o = {}
-         o['latitude'] = Number( element.Latitude);
-         o['longitude'] = Number( element.Longitude);
-         
-        // console.log(o);
-
-         m.push(o);
-
-
-          
-        });
-    
-        }catch(ex)
-        {
-           console.log(ex);
-        }
-
-        m = JSON.parse(JSON.stringify( m));
-
-      // alert(JSON.stringify(m));
-
-     // console.log(m)
-
-       this.setState({markers:m})
-
-     
-      //this.setState({bays:d,refreshing:false})
-      //console.log(JSON.parse(this.state.bays));
-          
-    });
-
-    socket.on("connection", (socket) => {
-    // alert("connected");
-      });
-
-      socket.onAny((eventName, ...args) => {
-        // ...
-        //alert();
-      });
    
   }
 
 render(){
-  const { viewport, tempMarker, markers } = this.state;
 
     return(
 
@@ -106,27 +49,18 @@ render(){
                                     events={this.state.events}
                                     height={1250}
                                 />
-          
-        
           </div>
-
-      
 </div>
 
 </div>
 </div>
  
 </div>
-
-      
       </div>
    
     </div>
   </div>
 </div>
-
-
-          
     )
 }
 
