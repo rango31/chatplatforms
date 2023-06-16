@@ -1,0 +1,48 @@
+{
+  "name": "chatplatforms",
+  "version": "1.0.0",
+  "description": "chatplatform interfaces",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app",
+    "dev": "nodemon app --env development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rango31/chatplatforms.git"
+  },
+  "keywords": [
+    "chat",
+    "whatsappweb",
+    "interfaces",
+    "qrcode"
+  ],
+  "author": "@rango31",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rango31/chatplatforms/issues"
+  },
+  "homepage": "https://github.com/rango31/chatplatforms#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "cron": "^2.3.1",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "knex": "^2.4.2",
+    "moment": "^2.29.4",
+    "node-cron": "^3.0.2",
+    "nodemon": "^2.0.22",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "random-number": "0.0.9",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "whatsapp-web.js": "^1.21.0"
+  }
+}

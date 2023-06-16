@@ -1,0 +1,73 @@
+/* Write your custom CSS here */
+.marker {
+    width:0;
+    height:0;
+  }
+  
+  .marker  span {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-sizing:border-box;
+    width: 29px;
+    height: 29px;
+    color:#fff;
+    background: #4D2D73;
+    border:solid 2px;
+    border-radius: 0 70% 70%;
+    box-shadow:0 0 2px #000;
+    cursor: pointer;
+    transform-origin:0 0;
+    transform: rotateZ(-135deg);
+    color: rgba(216, 181, 25, 0.452);
+  }
+
+  .markersuccess  span {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-sizing:border-box;
+    width: 29px;
+    height: 29px;
+    color:#fff;
+    background: #1bb456;
+    border:solid 2px;
+    border-radius: 0 70% 70%;
+    box-shadow:0 0 2px #000;
+    cursor: pointer;
+    transform-origin:0 0;
+    transform: rotateZ(0deg);
+  }
+
+  .markerdanger  span {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-sizing:border-box;
+    width: 29px;
+    height: 29px;
+    color:#fff;
+    background: #e92525;
+    border:solid 2px;
+    border-radius: 0 70% 70%;
+    box-shadow:0 0 2px #000;
+    cursor: pointer;
+    transform-origin:0 0;
+    transform: rotateZ(0deg);
+  }
+  
+  .marker b {
+    transform: rotateZ(135deg)
+  }
+  
+  .temporary-marker span {
+    background: #D3D3D3;
+  }
+
+  .table-house::-webkit-scrollbar {
+    display: none;
+}
+.table-house {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
