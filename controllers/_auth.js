@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
 const {  getUserByLogin, getToken, generateOTP } = require('../services/userService');
 const { selectWhere, insertRecord, updateRecord, select } = require('../services/generalDbService');

@@ -44,15 +44,11 @@ class Login extends React.PureComponent {
 
                         localStorage.setItem(`token`, data.token);
 
-                        var data = JSON.stringify(data);
-                        var nd = JSON.parse(data);
+                        let d = JSON.stringify(data);
+                        let nd = JSON.parse(d);
 
-                       // alert(data)
-
-                       
-                        localStorage.setItem(`fullname`, nd.user.FirstName + " " + nd.user.LastName);
-                        localStorage.setItem(`userid`, nd.user.UserId);
-                        localStorage.setItem(`role`, nd.user.RoleId);
+                        localStorage.setItem(`fullname`, nd.user.fullName);
+                        localStorage.setItem(`userid`, nd.user.userId);
 
                         _self.props.history.push({
                             pathname: _self.state.nexturl,

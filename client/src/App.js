@@ -7,7 +7,7 @@ import {
     Switch
 } from "react-router-dom";
 
-import Main from './Main/Calendar';
+import Main from './Main/Home';
 import Fof from './auth/Fof';
 import Profile from './auth/Profile';
 import Login from './auth/Login';

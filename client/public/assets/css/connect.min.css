@@ -2479,7 +2479,7 @@ tr.group {
 .mailbox-compose {
     display: table;
     position: fixed;
-    height: calc(100% - 60px);
+    height: calc(100% - 40px);
     width: 400px;
     background: #fff;
     right: 0;
@@ -2569,13 +2569,13 @@ tr.group {
 .mailbox-item {
     display: block;
     position: fixed;
-    height: calc(105vh );
-    width:950px;
+    height: calc(100vh );
+    width:850px;
     background: #fff;
     right: 0;
     z-index: 99;
     box-shadow: 0 0 1.25rem rgba(31, 45, 61, 0.04);
-    padding: 45px;
+    padding: 25px;
     transform: translateX(100%);
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;

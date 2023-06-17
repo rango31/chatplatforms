@@ -15,37 +15,8 @@ class Sidebar extends Component {
 
   componentDidMount(){
 
-    let self = this;
-    let {width} = this.state;
-
-    if(width >= 1920 ){
       document.body.style.zoom = "85%";
-    }
-    else if(width >= 1280 && width < 1600){
-      document.body.style.zoom = "85%";
-    } 
-    else if(width >= 768 && width < 1024){
-      document.body.style.zoom = "85%";
-    }else{
-      document.body.style.zoom = "85%";
-    }
-
-    window.addEventListener('resize', function(event) {
-      let newwidth = document.body.offsetWidth
-      if(newwidth >= 1920 ){
-        document.body.style.zoom = "85%";
-      }
-      else if(newwidth >= 1280 && width < 1600){
-        document.body.style.zoom = "85%";
-      } 
-      else if(newwidth >= 768 && width < 1024){
-        document.body.style.zoom = "85%";
-      }else{
-        document.body.style.zoom = "85%";
-      }
-  
-  }, true);
-    
+ 
       var e, o;
       (e = $(".accordion-menu li:not(.open) ul"));
           (o = $(".accordion-menu li.active-page > a"));

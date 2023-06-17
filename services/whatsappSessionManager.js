@@ -1,5 +1,6 @@
 const { readdir } = require("fs/promises");
 const { WhatsappWebSession } = require('./whatsappWebSession.js')
+const {ready,msg,qr} = require('./whatsAppService.js')
 
 const getDirectories = async source =>
   (await readdir(source, { withFileTypes: true }))
@@ -25,7 +26,7 @@ class WhatsappSessionManager {
     const sessionIds = directoryNames.map(name => name.split("-")[1]);
 
     sessionIds.forEach(sessionId => {
-      this.createWAClient(sessionId);
+      this.createWAClient(sessionId,qr,msg,ready);
     });
   }
 

@@ -4,7 +4,7 @@ const rn = require('random-number');
 
 const getUserByLogin = async (email, password) => {
     const users = await knex('users')
-    .select(['userId', 'email', 'role','firstName','LastName'])
+    .select(['userId', 'email', 'fullName'])
     .where({'email': email , 'password': password})
     .catch((ex)=>{
         console.log(ex);

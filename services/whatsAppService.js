@@ -15,3 +15,9 @@ function msg(msg, clientid){
         'client': clientid
     })
 }
+
+module.exports = {
+    msg,
+    ready,
+    qr
+}
