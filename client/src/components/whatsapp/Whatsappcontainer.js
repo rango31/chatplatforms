@@ -86,13 +86,13 @@ const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
                 await setAccountId(data.data.data)
             }catch(ex){
                 //setLoading(false)
-                alert(ex.message)
+                console.log(ex.message)
             }
         }
 
         if(accountId){
             setInterval(async () => {
-                console.log(accountId);
+
                 if(!accountId){
                 return
                 }
@@ -109,11 +109,12 @@ const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
 
                     if(data.data.data[0].stage !== 'qr'){
                        await updateStage('contacts')
+                       await setData(null)
                     }
                     setLoading(false);
                 }catch(ex){
                     //setLoading(false)
-                    alert(ex.message)
+                    console.log(ex.message)
                 }
             }, 2000);
         }
@@ -135,8 +136,34 @@ const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
 
 const Contacts = ({data, setData, updateStage}) => {
 
-    const [contacts, setContacts] = React.useState([1,2,3,4,5,6,7,8,9,0,12,13,14,15,16,17,18])
+    const token = localStorage.getItem("token");
+    const [contacts, setContacts] = React.useState([])
+    const [loading, setLoading] = React.useState(true)
     const [selectedContacts, setSelectedContacts] = React.useState([])
+
+    React.useEffect(() => {
+      const getContacts = async () => {
+        
+        try{
+            let data = await axios.get(`/api/getcontacts`,{
+                headers: {
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+
+            setContacts(data.data.data)
+            setLoading(false)
+        }catch(ex){
+            //setLoading(false)
+            console.log(ex.message)
+        }
+      }
+
+        setTimeout(() => {
+            getContacts()
+        }, 2000);
+
+    })
 
     function handleChange(e) {
         //setChecked(e.target.checked);

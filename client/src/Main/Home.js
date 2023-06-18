@@ -19,11 +19,11 @@ class Home extends Component {
 
     this.columns = [
       {
-          key: "Message",
+          key: "message",
           text: "Message",
           sortable: true
       },{
-        key: "From",
+        key: "from",
         text: "From",
         sortable: true
     },
@@ -77,14 +77,13 @@ class Home extends Component {
 
             $('#loader').hide();
 
-              
           }else{
-            alert(data.message);
+            console.log(data.message);
             $('#loader').hide();
   
           }
         }.bind(this),error: function (xhr, error) {
-          alert(xhr.status);
+          console.log(xhr.status);
          
       },
       })
