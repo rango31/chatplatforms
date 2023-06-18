@@ -16,6 +16,7 @@ exports.up = function(knex) {
         table.string('message');
         table.string('from');
         table.string('isGroup');
+        table.string('accountId');
         table.datetime('DateReceived');
       })
 };

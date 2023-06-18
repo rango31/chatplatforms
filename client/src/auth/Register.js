@@ -83,13 +83,10 @@ render(){
                     <input type="text" className="form-control" id="fullname" placeholder="Fullname" name="fullname" required aria-required />
                   </div>
                   <div className="form-group">
-                    <input type="text" className="form-control" id="phone" placeholder="phone" name="phone" required aria-required />
+                    <input type="password" className="form-control"  name="password" required aria-required placeholder="Password" />
                   </div>
                   <div className="form-group">
-                    <input type="password" className="form-control" id="exampleInputPassword1" name="password" required aria-required placeholder="Password" />
-                  </div>
-                  <div className="form-group">
-                    <input type="password" className="form-control" id="exampleInputPassword1" name="vpassword" required aria-required placeholder="Verify Password" />
+                    <input type="password" className="form-control"  name="vpassword" required aria-required placeholder="Verify Password" />
                   </div>
                   <button type="submit" id="rgbtn" className="btn btn-primary btn-block btn-submit">Sign Up</button>
                   <div className="auth-options">

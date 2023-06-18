@@ -16,6 +16,7 @@ class WhatsappSessionManager {
   }
 
   createWAClient = (sessionId, qrGenerationCallback, msgCallBack,readyInstanceCallback) => {
+    console.log('creating account')
     return new WhatsappWebSession(qrGenerationCallback, readyInstanceCallback,msgCallBack,sessionId);
   };
 

@@ -1,11 +1,13 @@
 const qrcode = require('qrcode-terminal');
+const { updateRecord } = require('./generalDbService');
 
-function qr(qr) {
-    qrcode.generate(qr, { small: true }); 
+function qr(qr, clientId) {
+    //qrcode.generate(qr, { small: true }); 
+    updateRecord({metadata:qr},'useraccounts','accountId',clientId);
 }
 
-function ready(){
-    console.log('app is ready')
+function ready(clientId){
+    console.log('app is ready doe client ', clientId)
 }
 
 function msg(msg, clientid){

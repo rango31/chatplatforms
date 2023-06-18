@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
 
 const {  getUserByLogin, getToken, generateOTP } = require('../services/userService');
 const { selectWhere, insertRecord, updateRecord, select } = require('../services/generalDbService');
@@ -41,9 +42,63 @@ async function login(req, res) {
     }
 }
 
+async function register(req,res) {
+    let { email , password, fullname, vpassword } = req.body;
+
+    if(!email || !password || !fullname || !vpassword){
+        return res.json({
+            status: 400,
+            success: false,
+            message: 'Please provide all fields'
+        });
+    }
+
+    if(password !== vpassword){
+        return res.json({
+            status: 400,
+            success: false,
+            message: 'Passwords do not match'
+        });
+    }
+
+    if(password.length < 4){
+        return res.json({
+            status: 400,
+            success: false,
+            message: 'Password should be atleast 4 chars long'
+        });
+    }
+
+    password = bcrypt.hashSync(password, process.env.bcrypt_salt);
+
+    let users = await getUserByLogin( email, password);
+
+    if (users.length > 0) {
+        return res.json({
+            status: 400,
+            success: false,
+            message: `Email ${email} already registered`
+        });
+    }else{
+        const user = {email, fullName:fullname, password, userId: uuidv4()}
+
+        await insertRecord(user,'users');
+
+        return res.json({
+            status: 201,
+            success: true,
+            message: `Account registered`
+        });
+
+
+    }
+
+
+}
+
 async function checkToken(req, res, next) {
 
-    if (req.url !== '/login'  && req.url !== '/reset' && req.url !== '/confirmdetails' && req.url !== '/createuser' ) {
+    if (req.url !== '/login'  && req.url !== '/register' ) {
 
         let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
 
@@ -95,5 +150,5 @@ async function users(req,res){
 }
 
 module.exports = {
-    login, checkToken, users
+    login, checkToken, users, register
 };

@@ -1,13 +1,13 @@
-const { Client, MessageMedia, Location ,  LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 
 class WhatsappWebSession {
   constructor(callback, readyCallback,msgCallback, clientId) {
 
     this.client = new Client({
       puppeteer: {
-        headless: true,
+        headless: false,
         args: [
-          '--no-sandbox',
+          '--no-sandbox','--disable-dev-shm-usage'
         ]
       },
       authStrategy: new LocalAuth({
@@ -18,12 +18,12 @@ class WhatsappWebSession {
 
     this.client.on('qr', (qr) => {
       this.qr = qr;
-      callback(qr);
+      callback(qr,clientId);
     });
     
     this.client.on('ready', () => {
       console.log('Client is ready!');
-      readyCallback();
+      readyCallback(clientId);
     });
 
     this.client.on('message', (msg) => {

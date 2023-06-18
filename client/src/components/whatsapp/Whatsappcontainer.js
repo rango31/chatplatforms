@@ -1,12 +1,13 @@
 import React from 'react'
 import QRCode from "react-qr-code";
+import axios from 'axios';
 
 export function Whatsappcontainer() {
 
   const [userId, setUserId] = React.useState('0')
-  const [accountId, setAccountId] = React.useState('0')
+  const [accountId, setAccountId] = React.useState(null)
   const [stage, setStage] = React.useState('new')
-  const [data, setData] = React.useState('whatsapp link data')
+  const [data, setData] = React.useState(null)
 
   function updateStage(stage) {
     setStage(stage)
@@ -22,7 +23,7 @@ export function Whatsappcontainer() {
             </div>
         </div>
         {
-           renderSwitch(stage, data , updateStage, setData)
+           renderSwitch(stage, data , updateStage, setData, setAccountId, accountId)
         }
 
         <div className="divider" />
@@ -30,12 +31,12 @@ export function Whatsappcontainer() {
   )
 }
 
-const renderSwitch = (stage, data , updateStage , setData)=> {
+const renderSwitch = (stage, data , updateStage , setData , setAccountId, accountId)=> {
     switch(stage) {
       case 'new':
         return <New updateStage={updateStage}/>;
       case 'qr':
-        return <Qr data={data} setData={setData} updateStage={updateStage}/>;
+        return <Qr data={data} setData={setData} updateStage={updateStage} setAccountId={setAccountId} accountId={accountId}/>;
       case 'contacts':
         return <Contacts updateStage={updateStage} setData={setData} data={data}/>;
       case 'complete':
@@ -65,19 +66,70 @@ const Load = () => {
     );
 };
 
-const Qr = ({data, setData, updateStage}) => {
+const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
     const [loading, setLoading] = React.useState(true)
+    const [q,setQ] = React.useState(null)
 
-    setInterval(() => {
-        setLoading(false)
-    }, 5000);
+    const token = localStorage.getItem("token");
 
-    setTimeout(() => {
-        updateStage('contacts')
-    }, 15000);
+    React.useEffect(() => {
+        const startLogin = async () => {
+            
+            try{
+                let data = await axios.get(`/api/startlogin`,{
+                    headers: {
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+
+                console.log(data.data.data)
+                await setAccountId(data.data.data)
+            }catch(ex){
+                //setLoading(false)
+                alert(ex.message)
+            }
+        }
+
+        if(accountId){
+            setInterval(async () => {
+                console.log(accountId);
+                if(!accountId){
+                return
+                }
+
+                try{
+                    let data = await axios.post(`/api/getdata`,{accountid:accountId},{
+                        headers: {
+                            'Authorization': `Bearer ${token}` 
+                        }
+                    });
+
+                   // setData(data.data.data[0].metadata);
+                    setQ(data.data.data[0].metadata)
+
+                    if(data.data.data[0].stage !== 'qr'){
+                       await updateStage('contacts')
+                    }
+                    setLoading(false);
+                }catch(ex){
+                    //setLoading(false)
+                    alert(ex.message)
+                }
+            }, 2000);
+        }
+
+        if(!accountId && !data){
+            startLogin();
+        }
+
+      },[setAccountId,accountId, token,data])
+
+      if(data){
+        setLoading(false);
+      }
 
     return (
-        loading ?  <Load/> : <QRCode value={data} style={{width:'100%', height:'100%'}}/>
+         loading || !q ?  <Load/> : <QRCode value={q} style={{width:'100%', height:'100%'}}/>
     );
 };
 
