@@ -4,7 +4,7 @@ const router = express.Router();
 
 const { checkToken , login, users,register} = require('../controllers/_auth.js');
 const { messages } = require('../controllers/_messages.js');
-const { startLogin, getData } = require('../controllers/_whatsapp.js');
+const { startLogin, getData, updateData } = require('../controllers/_whatsapp.js');
 
 router.use(checkToken);
 //auth
@@ -18,5 +18,6 @@ router.get('/messages', messages);
 //useraccounts
 router.get('/startlogin', startLogin);
 router.post('/getdata', getData);
+router.post('/updatedata', updateData);
 
 module.exports = router;

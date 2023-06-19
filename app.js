@@ -81,13 +81,11 @@ app.set('port', process.env.PORT || 3000);
 knex.migrate.latest()
 .then(async () => {
     console.log('restoring previus whatsapp sessions');
-   // await singularWhatsappSessionManager.restorePreviousSessions();
+    await singularWhatsappSessionManager.restorePreviousSessions();
 
     const server = app.listen(app.get('port'), function() {
         console.log('Express server listening on port 3000');
     });
-
-   // singularWhatsappSessionManager.createWAClient('tadiwa',qr,msg, ready);
 
 }).catch((e)=>{
     console.log(e);

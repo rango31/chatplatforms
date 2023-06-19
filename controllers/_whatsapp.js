@@ -28,7 +28,13 @@ async function getData(req,res){
     });
 }
 
+async function updateData(req,res){
+    const {metadata, accountId, stage} = req.body;
+    await updateRecord({metadata, stage},'useraccounts','accountId',accountId );
+}
+
 module.exports = {
     startLogin,
-    getData
+    getData,
+    updateData
 }

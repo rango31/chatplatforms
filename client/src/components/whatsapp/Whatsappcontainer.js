@@ -38,7 +38,7 @@ const renderSwitch = (stage, data , updateStage , setData , setAccountId, accoun
       case 'qr':
         return <Qr data={data} setData={setData} updateStage={updateStage} setAccountId={setAccountId} accountId={accountId}/>;
       case 'contacts':
-        return <Contacts updateStage={updateStage} setData={setData} data={data}/>;
+        return <Contacts updateStage={updateStage} setData={setData} data={data} setAccountId={setAccountId} accountId={accountId}/>;
       case 'complete':
             return <Complete/>;
       default:
@@ -105,16 +105,19 @@ const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
                     });
 
                    // setData(data.data.data[0].metadata);
-                    setQ(data.data.data[0].metadata)
 
                     if(data.data.data[0].stage !== 'qr'){
                        await updateStage('contacts')
                        await setData(null)
+                    }else{
+                        setQ(data.data.data[0].metadata)
+                        
                     }
+
                     setLoading(false);
                 }catch(ex){
                     //setLoading(false)
-                    console.log(ex.message)
+                    console.log(ex)
                 }
             }, 2000);
         }
@@ -123,7 +126,7 @@ const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
             startLogin();
         }
 
-      },[setAccountId,accountId, token,data])
+      },[setAccountId,accountId, token,data,updateStage,setData])
 
       if(data){
         setLoading(false);
@@ -134,7 +137,7 @@ const Qr = ({data, setData, updateStage, setAccountId,accountId}) => {
     );
 };
 
-const Contacts = ({data, setData, updateStage}) => {
+const Contacts = ({data, setData, updateStage, accountId}) => {
 
     const token = localStorage.getItem("token");
     const [contacts, setContacts] = React.useState([])
@@ -145,43 +148,64 @@ const Contacts = ({data, setData, updateStage}) => {
       const getContacts = async () => {
         
         try{
-            let data = await axios.get(`/api/getcontacts`,{
+            let data = await axios.post(`/api/getdata`,{accountid:accountId},{
                 headers: {
                     'Authorization': `Bearer ${token}` 
                 }
             });
 
-            setContacts(data.data.data)
+            await setContacts(JSON.parse(data.data.data[0].metadata));
             setLoading(false)
         }catch(ex){
             //setLoading(false)
-            console.log(ex.message)
+            console.log(ex)
         }
       }
 
-        setTimeout(() => {
-            getContacts()
-        }, 2000);
+      getContacts()
 
     })
 
     function handleChange(e) {
-        //setChecked(e.target.checked);
-        console.log(e.target.value)
-        console.log(e.target.checked)
+        let news = selectedContacts;
+
+        if(e.target.checked === true){
+           news.push(contacts.find((c)=> { return c.id === e.target.value}))
+           setSelectedContacts(news);
+        }else{
+            news = selectedContacts.filter((c)=> { return c.id !== e.target.value})
+            setSelectedContacts(news);
+        }
+
+        console.log(selectedContacts.length)
      }
 
-     function saveAndComplete(){
-        updateStage('complete')
+     async function saveAndComplete(){
+        
+            try{
+                let data = await axios.post(`/api/updatedata`,{metadata:JSON.stringify(selectedContacts), accountId,stage:'complete' },{
+                    headers: {
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+    
+                await setContacts(JSON.parse(data.data.data))
+                setLoading(false)
+            }catch(ex){
+                //setLoading(false)
+                console.log(ex.message)
+            }
+          
+        await updateStage('complete')
      }
 
     return (
         <>
         {
-            contacts.map((item, index) => (
+            contacts?.map((item, index) => (
                 <span key={{index}} style={{padding:'-20px'}}>
-                    <label style={{fontSize:'30px'}}>{item}</label>
-                    <input style={{height:'30px',width:'30px', float:'right'}} value={item} type="checkbox" onChange={handleChange} />
+                    <label style={{fontSize:'30px'}}>{item.name}</label>
+                    <input style={{height:'30px',width:'30px', float:'right'}} value={item.id} type="checkbox" onChange={handleChange} />
                     <hr/>
                 </span>  
             ))

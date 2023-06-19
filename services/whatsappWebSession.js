@@ -23,7 +23,7 @@ class WhatsappWebSession {
     
     this.client.on('ready', () => {
       console.log('Client is ready!');
-      readyCallback(clientId);
+      readyCallback(clientId, this.client);
     });
 
     this.client.on('message', (msg) => {

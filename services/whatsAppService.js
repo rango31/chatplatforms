@@ -1,6 +1,6 @@
 const qrcode = require('qrcode-terminal');
 const { updateRecord } = require('./generalDbService');
-const singularWhatsappSessionManager = require('./whatsappSessionManager');
+const { getTheClient } = require('./whatsappSessionManager');
 
 function qr(qr, clientId) {
     //qrcode.generate(qr, { small: true }); 
@@ -10,7 +10,10 @@ function qr(qr, clientId) {
 function ready(clientId){
 
     const  contacts = [];
-    const client = singularWhatsappSessionManager.getClientFromSessionId(clientId);
+    const client = getTheClient(clientId);
+
+    console.log(client)
+   /*
     const chats = client.getChats();
     console.log(chats);
 
@@ -19,15 +22,18 @@ function ready(clientId){
         contacts.push({id,name})   
     }
 
+    console.log('contacts updated')
     updateRecord({metadata:contacts,stage:'contacts'},'useraccounts','accountId',clientId);
+    */
 }
 
 function msg(msg, clientid){
-    console.log({
+   /* console.log({
         'From':msg.from,
         'Body':msg.body,
         'client': clientid
-    })
+   })
+   */
 }
 
 module.exports = {
