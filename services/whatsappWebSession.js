@@ -31,6 +31,32 @@ class WhatsappWebSession {
       msgCallback(msg, clientId);
     });
 
+    
+    //Emitted when there has been an error while trying to restore an existing session
+    this.client.on('auth_failure', (error) => {
+     // callback(qr,clientId);
+    });
+
+    //Emitted when authentication is successful
+    this.client.on('authenticated', () => {
+      // callback(qr,clientId);
+     });
+
+     // Emitted when the connection state changes
+     this.client.on('change_state', (state) => {
+      // callback(qr,clientId);
+     });
+
+      // Emitted when the client has been disconnected
+    this.client.on('disconnected', (reason) => {
+      //could be reason/ WASTATE
+      // callback(qr,clientId);
+    });
+
+    this.client.on('incoming_call', (call) => {
+      // callback(qr,clientId);
+    });
+
     this.client.initialize();
   }
 
