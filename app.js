@@ -1,17 +1,12 @@
 'use strict';
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
-const cron = require('node-cron');
-const moment = require('moment');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 
 const singularWhatsappSessionManager  = require('./services/whatsappSessionManager');
-const qrcode = require('qrcode-terminal');
-const {qr, ready, msg} = require('./services/whatsAppService')
 
 process.env.jwt_secret = 'chat3425#$G$#3VBHSJBSJTSDDN4c4cEfFvGggGGf5t3e4Y%G&tg67GUbtfVE345$4#3#$$456&6589citysdbsbjmsdbjb';
 process.env.bcrypt_salt = '$2a$06$bghdsSsGHJG3554AaSDSDtrt5g][gff.htfgfh4033xvs5345dfe65456556755sdsd6f7sdfHfgshgfshdfsdh35';
@@ -80,6 +75,11 @@ app.set('port', process.env.PORT || 3000);
 
 knex.migrate.latest()
 .then(async () => {
+
+       
+
+    ////////////////////
+
     console.log('restoring previus whatsapp sessions');
     await singularWhatsappSessionManager.restorePreviousSessions();
 

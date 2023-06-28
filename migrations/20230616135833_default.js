@@ -1,28 +1,22 @@
 
 exports.up = function(knex) {
-    return knex.schema.createTable('users', function (table) {
-        table.string('userId').primary().notNull();
-        table.string('fullName');
-        table.string('email');
-        table.string('password');
-      }).createTable('useraccounts', function (table) {
+    return knex.schema.createTable('useraccounts', function (table) {
         table.string('accountId').primary().notNull();
         table.string('userId');
         table.string('service');
         table.string('metadata');
         table.string('stage');
-      }).createTable('messages', function (table) {
-        table.string('messageId').primary().notNull();
-        table.string('message');
-        table.string('from');
-        table.string('isGroup');
-        table.string('accountId');
-        table.datetime('DateReceived');
+        table.string('proxyGroup');
+      }).createTable('proxyGroups', function (table) {
+        table.string('proxyGroupId').primary().notNull();
+        table.string('url');
+        table.string('username');
+        table.string('password');
       })
 };
 
 exports.down = function(knex) {
     return knex.schema
-        .dropTable('users')
+        .dropTable('useraccounts')
         .dropTable('useraccounts')
 };

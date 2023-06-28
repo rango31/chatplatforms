@@ -7,7 +7,7 @@ function qr(qr, clientId) {
     updateRecord({metadata:qr},'useraccounts','accountId',clientId);
 }
 
-function ready(clientId){
+function clientReady(clientId){
 
     const  contacts = [];
     const client = getTheClient(clientId);
@@ -36,8 +36,13 @@ function msg(msg, clientid){
    */
 }
 
+function disconnected(msg, clientid) {
+
+}
+
 module.exports = {
     msg,
     ready,
-    qr
+    qr, 
+
 }

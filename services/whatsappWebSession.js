@@ -7,7 +7,7 @@ class WhatsappWebSession {
       puppeteer: {
         headless: false,
         args: [
-          '--no-sandbox','--disable-dev-shm-usage'
+          '--no-sandbox','--disable-dev-shm-usage','--proxy-server=23.23.23.23'
         ]
       },
       authStrategy: new LocalAuth({
@@ -15,6 +15,8 @@ class WhatsappWebSession {
         dataPath: './sessions',
       })
     });
+
+    //this.client.options.userAgent = ''
 
     this.client.on('qr', (qr) => {
       this.qr = qr;
