@@ -1,14 +1,15 @@
 const { selectWhere, insertRecord, updateRecord, select } = require('../services/generalDbService');
-const { v4: uuidv4 } = require('uuid');
 const singularWhatsappSessionManager = require('../services/whatsappSessionManager');
-const { qr, ready, msg } = require('../services/whatsAppService');
 
-async function startLogin(req,res){
-    const accountId = await uuidv4();
-    const userId = req.decoded.userId;
+async function authClient(req,res){
+    const id = req.params.id;
+
+    //check if id exists
 
     await insertRecord({accountId, service:'whatsapp',metadata:'',stage:'qr',userId},'useraccounts');
-    await singularWhatsappSessionManager.createWAClient(accountId, qr, msg,ready);
+    await singularWhatsappSessionManager.createWAClient(id);
+
+    //return polling url for qrcode 
 
     return res.json({
         status: 200,
@@ -17,24 +18,49 @@ async function startLogin(req,res){
     });
 }
 
-async function getData(req,res){
-    const accountId = req.body.accountid;
-    const data = await selectWhere('accountId', accountId, 'useraccounts', ['metadata','stage','accountId']) 
-   
-    return res.json({
-        status: 200,
-        success: true,
-        data: data
-    });
+async function getContacts(req, res){
+    const id = req.params.id;
+    const client = await singularWhatsappSessionManager.getSessionClient(id);
+
+    res.json(await client.getContacts());
 }
 
-async function updateData(req,res){
-    const {metadata, accountId, stage} = req.body;
-    await updateRecord({metadata, stage},'useraccounts','accountId',accountId );
+async function connectionStatus(req, res){
+    const id = req.params.id;
+    const client = await singularWhatsappSessionManager.getSessionClient(id);
+
+    res.send(await client.getState());
+}
+
+async function logout(req, res) {
+    const id = req.params.id;
+    const client = singularWhatsappSessionManager.getSessionClient(id);
+
+    await client.destroy();
+    //delete files
+    //make sure object is closed
+}
+
+async function poll(req, res){
+    //return metadata field
+}
+
+async function updateContacts(req, res){
+    const id = req.params.id;
+    const contacts = req.body.contacts;
+
+    if(id && contacts){
+
+    }else{
+        return 'please Contacts required';
+    }
 }
 
 module.exports = {
-    startLogin,
-    getData,
-    updateData
+    authClient,
+    getContacts,
+    connectionStatus,
+    poll,
+    updateContacts,
+    logout
 }

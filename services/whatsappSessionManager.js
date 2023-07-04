@@ -8,7 +8,9 @@ const getDirectories = async source =>
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name);
 
-function qrReceived(qr, clientId) {
+///////Events//////////////////////////////    
+
+async function qrReceived(qr, clientId) {
   updateRecord({metadata:qr},'useraccounts','accountId',clientId);
 }
   
@@ -34,7 +36,7 @@ async function clientReady(clientId, client){
     
 }
   
-function messageReceived(msg, clientid){
+async function messageReceived(msg, clientid){
     const account = selectWhere('accountId',clientid, 'useraccounts','*');
     const { metadata, stage } = account
     const { from, body, client } = msg;
@@ -48,6 +50,13 @@ function messageReceived(msg, clientid){
       }
     }
 }
+
+async function onAuthenticated(clientId){}
+
+async function onAuthFail(clientId, msg){}
+
+async function onDisconnect(reason, clientId){}
+
 
 class WhatsappSessionManager {
   sessionIdVsClientInstance = {};
