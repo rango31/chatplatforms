@@ -5,15 +5,34 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
+const winston = require('winston');
+const swaggerUi = require('swagger-ui-express')
+const swaggerAutogen = require('swagger-autogen')()
+const sf = require('./swagger_output.json');
 
 const singularWhatsappSessionManager  = require('./services/whatsappSessionManager');
+const { dd } = require('./services/helpersService');
 
 process.env.jwt_secret = 'chat3425#$G$#3VBHSJBSJTSDDN4c4cEfFvGggGGf5t3e4Y%G&tg67GUbtfVE345$4#3#$$456&6589citysdbsbjmsdbjb';
 process.env.bcrypt_salt = '$2a$06$bghdsSsGHJG3554AaSDSDtrt5g][gff.htfgfh4033xvs5345dfe65456556755sdsd6f7sdfHfgshgfshdfsdh35';
+process.env.env = 'development';
 
 const knexConfig = require('./knexfile');
-const knex = require('knex')(knexConfig['production'])
+const knex = require('knex')(knexConfig['development'])
 global.knex = knex;
+
+global.report = winston.createLogger({
+    level: 'info',
+    format: winston.format.simple(),
+    // defaultMeta: { System: 'LocalyserScrapper'},
+    transports: [
+      new winston.transports.File({ filename: './logs/warn.log', level: 'warn' }),
+      new winston.transports.File({ filename: './logs/error.log', level: 'error' }),
+      new winston.transports.File({ filename: './logs/info.log', level: 'info' }),
+    ],
+});
+
+report.add(new winston.transports.Console({ format: winston.format.simple() }));
 
 const api = require('./routes/api');
 
@@ -41,14 +60,13 @@ app.use(async function(req, res, next) {
     next();
 });
 
-//app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.text({ type: 'text/*' }))
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, "./client/build/")));
 
 app.use('/api', api);
+app.use('/documentation', swaggerUi.serve, swaggerUi.setup(sf))
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -74,23 +92,23 @@ app.use(function(err, req, res, next) {
 app.set('port', process.env.PORT || 3000);
 
 knex.migrate.latest()
-.then(async () => {
+    .then(async () => {
 
-       
+        report.log({ level: 'info', message: `${await dd()} Restoring previous Whatsapp Sessions...` });
+        //singularWhatsappSessionManager.restorePreviousSessions();
 
-    ////////////////////
+        report.log({ level: 'info', message: `${await dd()} Setting up swagger docs. You can access them at localhost:3000/documentation/` });
+        swaggerAutogen('./swagger_output.json', ['./routes/api.js'])
 
-    console.log('restoring previus whatsapp sessions');
-    await singularWhatsappSessionManager.restorePreviousSessions();
+        report.log({ level: 'info', message: `${await dd()} Starting API server, WhatsApp sessions might not be ready at this time...` });
+        app.listen(app.get('port'), async function() {
+            report.log({ level: 'info', message: `${await dd()} Whatsapp Server running on Port 3000` });
+        });
 
-    const server = app.listen(app.get('port'), function() {
-        console.log('Express server listening on port 3000');
+    }).catch(async (e)=>{
+        report.log({ level: 'error', message: `${await dd()} ${e}` });
+        process.exit(1);
     });
-
-}).catch((e)=>{
-    console.log(e);
-    process.exit(1);
-});
 
 
 

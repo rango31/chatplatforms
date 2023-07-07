@@ -47,11 +47,16 @@ const selectPageWhere = async (field, value,table, filter , currentPage, perPage
     return data;
 }
 
-const selectWhere = async (field, value, table, filter) => {
+const selectWhere = async (whereFields, table, filter) => {
 
     const data = await knex(table)
     .select(filter)
-    .where({[field]: value})
+    .where((q) => {
+      whereFields.map((row)=> {
+        const {field, value} = row;
+        q.where(field, value);
+      })
+    })
     .catch((ex)=>{
         console.log(ex);
         return [];
@@ -64,6 +69,20 @@ const insertRecord = async ( data, table) => {
 
     await knex(table)
         .insert( data )
+        .catch((ex)=>{
+            console.log(ex)
+            return false;
+        });
+
+    return true;
+}
+
+const upsertRecord = async ( data, table, conflictId) => {
+
+    await knex(table)
+        .insert(data)
+        .onConflict(conflictId)
+        .merge()
         .catch((ex)=>{
             console.log(ex)
             return false;
@@ -99,5 +118,5 @@ const delRecord = async (table, idName, id) => {
 }
 
 module.exports = {
-    select, selectWhere , insertRecord , updateRecord, selectPage, delRecord, selectPageWhere
+    select, selectWhere , insertRecord , updateRecord, selectPage, delRecord, selectPageWhere, upsertRecord
 };

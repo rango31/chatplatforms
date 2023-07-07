@@ -1,13 +1,17 @@
 const { selectWhere, insertRecord, updateRecord, select } = require('../services/generalDbService');
 const singularWhatsappSessionManager = require('../services/whatsappSessionManager');
+const randUserAgent = require('random-useragent');
 
 async function authClient(req,res){
     const id = req.params.id;
 
     //check if id exists
 
+    //get proxy
+    const ua = await randUserAgent.getRandom();
+
     await insertRecord({accountId, service:'whatsapp',metadata:'',stage:'qr',userId},'useraccounts');
-    await singularWhatsappSessionManager.createWAClient(id);
+    await singularWhatsappSessionManager.createWAClient(id, '',ua);
 
     //return polling url for qrcode 
 

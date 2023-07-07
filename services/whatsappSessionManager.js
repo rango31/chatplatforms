@@ -70,8 +70,9 @@ class WhatsappSessionManager {
     return this.sessionIdVsClientInstance[sessionId];
   };
 
-  createWAClient = (sessionId) => {
-    return new WhatsappWebSession(qrReceived, clientReady,messageReceived,sessionId);
+  createWAClient = (sessionId, proxy, useragent) => {
+    //generate random user agent
+    return new WhatsappWebSession( qrReceived, clientReady, messageReceived, sessionId, proxy, useragent );
   };
 
   async restorePreviousSessions() {
@@ -80,8 +81,9 @@ class WhatsappSessionManager {
     );
     const sessionIds = directoryNames.map(name => name.split("-")[1]);
 
-    sessionIds.forEach(sessionId => {
-      this.createWAClient(sessionId,qrReceived, messageReceived, clientReady);
+    sessionIds.forEach((sessionId) => {
+      //get client proxy and useragent
+      this.createWAClient(sessionId, '', '');
     });
   }
 }

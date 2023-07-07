@@ -1,13 +1,13 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
 class WhatsappWebSession {
-  constructor(callback, readyCallback,msgCallback, clientId) {
+  constructor(callback, readyCallback,msgCallback, clientId, proxy, useragent) {
 
     this.client = new Client({
       puppeteer: {
-        headless: false,
+        headless: true,
         args: [
-          '--no-sandbox','--disable-dev-shm-usage','--proxy-server=23.23.23.23'
+          '--no-sandbox','--disable-dev-shm-usage','"--disabled-setupid-sandbox"'
         ]
       },
       authStrategy: new LocalAuth({
@@ -16,7 +16,7 @@ class WhatsappWebSession {
       })
     });
 
-    //this.client.options.userAgent = ''
+    this.client.options.userAgent = 'SAMSUNG-SGH-E250/1.0 Profile/MIDP-2.0 Configuration/CLDC-1…e; Googlebot-Mobile/2.1;  http://www.google.com/bot.html)';
 
     this.client.on('qr', (qr) => {
       this.qr = qr;
