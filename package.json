@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/rango31/chatplatforms#readme",
   "dependencies": {
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
@@ -35,7 +36,7 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.2",
-    "knex-paginate": "^3.1.0",
+    "knex-paginate": "^3.1.1",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "node-cron": "^3.0.2",

@@ -20,12 +20,12 @@ async function clientReady(clientId, client){
 async function messageReceived(msg, clientid){
     const account = selectWhere([{field:'accountId', value:clientid}], 'accounts','*');
     const { metadata, stage, contacts } = account[0]
-    const { from, body, client } = msg;
+    const { from, body, client , isStatus, timestamp, to } = msg;
 
     if(stage === 'complete'){
       const contact = await JSON.parse(contacts.filter((c)=> { c.id === from}));
 
-      if(contact.length > 0){
+      if(contact.length > 0 && !isStatus){
 
         const { name, isGroup,  } = contact;
 
@@ -33,14 +33,14 @@ async function messageReceived(msg, clientid){
                           meta: {
                             userId: clientid,
                             to: {
-                              recipientId: from,
+                              recipientId: to,
                             },
                             from: {
                               recipientId: from,
                               name,
                               isGroup
                             },
-                            timestamp: 'Unix timestamp of the message',
+                            timestamp,
                             platform: 'WA'
                           },
                           message: {
@@ -49,11 +49,7 @@ async function messageReceived(msg, clientid){
                        }
           
          //throttling maybe ??
-         const result = await networkPost(message, '');
-
-         if(!result){
-              
-         }
+        await networkPost(message, '');
 
       }
     }
