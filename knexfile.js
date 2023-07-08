@@ -1,8 +1,6 @@
-// Update with your config settings.
+const { attachPaginate } = require('knex-paginate');
+attachPaginate();
 
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
 module.exports = {
   development: {
     client: 'mysql',

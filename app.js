@@ -1,6 +1,5 @@
 'use strict';
 const express = require('express');
-const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const compression = require('compression');
@@ -94,15 +93,15 @@ app.set('port', process.env.PORT || 3000);
 knex.migrate.latest()
     .then(async () => {
 
-        report.log({ level: 'info', message: `${await dd()} Restoring previous Whatsapp Sessions...` });
-        //singularWhatsappSessionManager.restorePreviousSessions();
+        report.log({ level: 'info', message: `${await dd()} Restoring previous Chat Sessions...` });
+        singularWhatsappSessionManager.restorePreviousSessions();
 
-        report.log({ level: 'info', message: `${await dd()} Setting up swagger docs. You can access them at localhost:3000/documentation/` });
+        report.log({ level: 'info', message: `${await dd()} Setting up swagger docs. You can access them at http://localhost:3000/documentation/` });
         swaggerAutogen('./swagger_output.json', ['./routes/api.js'])
 
-        report.log({ level: 'info', message: `${await dd()} Starting API server, WhatsApp sessions might not be ready at this time...` });
+        report.log({ level: 'info', message: `${await dd()} Starting API server, Chat sessions might not be ready at this time...` });
         app.listen(app.get('port'), async function() {
-            report.log({ level: 'info', message: `${await dd()} Whatsapp Server running on Port 3000` });
+            report.log({ level: 'info', message: `${await dd()} Chat Server running on Port 3000` });
         });
 
     }).catch(async (e)=>{

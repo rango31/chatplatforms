@@ -1,13 +1,26 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
 class WhatsappWebSession {
-  constructor(callback, readyCallback,msgCallback, clientId, proxy, useragent) {
+  
+  constructor ( 
+    qrCallback,
+    readyCallback,
+    msgCallback,
+    authCallback,
+    authFailCallback,
+    disconnectCallback,
+    clientId,
+    proxy,
+    useragent
+    ) {
+
+    proxy = proxy ? `--proxy-server=${proxy}` : '';
 
     this.client = new Client({
       puppeteer: {
         headless: true,
         args: [
-          '--no-sandbox','--disable-dev-shm-usage','"--disabled-setupid-sandbox"'
+          '--no-sandbox','--disable-dev-shm-usage','--disabled-setupid-sandbox',proxy
         ]
       },
       authStrategy: new LocalAuth({
@@ -16,47 +29,35 @@ class WhatsappWebSession {
       })
     });
 
-    this.client.options.userAgent = 'SAMSUNG-SGH-E250/1.0 Profile/MIDP-2.0 Configuration/CLDC-1…e; Googlebot-Mobile/2.1;  http://www.google.com/bot.html)';
+    this.client.options.userAgent = useragent;
 
     this.client.on('qr', (qr) => {
       this.qr = qr;
-      callback(qr,clientId);
+      qrCallback(qr,clientId);
     });
     
     this.client.on('ready', () => {
-      console.log('Client is ready!');
       readyCallback(clientId, this.client);
     });
 
     this.client.on('message', (msg) => {
-      console.log('msg received');
       msgCallback(msg, clientId);
     });
 
-    
-    //Emitted when there has been an error while trying to restore an existing session
     this.client.on('auth_failure', (error) => {
-     // callback(qr,clientId);
+     authFailCallback(error, clientId)
     });
 
-    //Emitted when authentication is successful
     this.client.on('authenticated', () => {
-      // callback(qr,clientId);
+      authCallback(clientId)
      });
 
-     // Emitted when the connection state changes
-     this.client.on('change_state', (state) => {
-      // callback(qr,clientId);
+     this.client.on('change_state', async (state) => {
+      report.log({ level: 'warn', message: `${ dd()} Client: ${clientId} state changed to: ${state}` });
      });
 
-      // Emitted when the client has been disconnected
     this.client.on('disconnected', (reason) => {
-      //could be reason/ WASTATE
-      // callback(qr,clientId);
-    });
-
-    this.client.on('incoming_call', (call) => {
-      // callback(qr,clientId);
+      disconnectCallback(reason, clientId)
     });
 
     this.client.initialize();

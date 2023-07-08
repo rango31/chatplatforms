@@ -2,61 +2,77 @@ const { readdir } = require("fs/promises");
 const { WhatsappWebSession } = require('./whatsappWebSession.js')
 const { updateRecord, selectWhere, insertRecord } = require('./generalDbService');
 const { v4: uuidv4 } = require('uuid');
+const { networkPost } = require("./networkService.js");
 
 const getDirectories = async source =>
   (await readdir(source, { withFileTypes: true }))
     .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
-
-///////Events//////////////////////////////    
+    .map(dirent => dirent.name);   
 
 async function qrReceived(qr, clientId) {
-  updateRecord({metadata:qr},'useraccounts','accountId',clientId);
+  updateRecord({metadata:qr, stage:'qr'},'accounts','accountId',clientId);
 }
   
 async function clientReady(clientId, client){
-
-    const  contacts = [];
-
-    const chats = await client.getContacts();
-
-    for (const chat of chats) {
-        let {id, name, isGroup} = chat;
-        if(isGroup){
-          id= name;
-        }else{
-          id = chat.id._serialized
-        }
-
-        contacts.push({ id, name, isGroup })   
-    }
-
-    console.log('contacts updated')
-    updateRecord({metadata:await JSON.stringify(contacts),stage:'contacts'},'useraccounts','accountId',clientId);
-    
+    updateRecord({metadata:'',stage:'complete'},'accounts','accountId',clientId);
 }
   
 async function messageReceived(msg, clientid){
-    const account = selectWhere('accountId',clientid, 'useraccounts','*');
-    const { metadata, stage } = account
+    const account = selectWhere([{field:'accountId', value:clientid}], 'accounts','*');
+    const { metadata, stage, contacts } = account[0]
     const { from, body, client } = msg;
 
     if(stage === 'complete'){
-      const contacts = JSON.parse(metadata);
-      const s = contacts.filter((c)=> { c.id === from});
+      const contact = await JSON.parse(contacts.filter((c)=> { c.id === from}));
 
-      if(s.length > 0){
-         insertRecord({message: body, messageId:uuidv4(), from,accountId:clientid, DateReceived:Date.now()}, 'messages')
+      if(contact.length > 0){
+
+        const { name, isGroup,  } = contact;
+
+        const message = {
+                          meta: {
+                            userId: clientid,
+                            to: {
+                              recipientId: from,
+                            },
+                            from: {
+                              recipientId: from,
+                              name,
+                              isGroup
+                            },
+                            timestamp: 'Unix timestamp of the message',
+                            platform: 'WA'
+                          },
+                          message: {
+                            body
+                          }
+                       }
+          
+         //throttling maybe ??
+         const result = await networkPost(message, '');
+
+         if(!result){
+              
+         }
+
       }
     }
 }
 
-async function onAuthenticated(clientId){}
+async function onAuthenticated(clientId){
+  report.log({ level: 'info', message: `${await dd()} Client: ${clientId} authenticated successfully` });
+  updateRecord({metadata:'',stage:'authenticated'},'accounts','accountId',clientId);
+}
 
-async function onAuthFail(clientId, msg){}
+async function onAuthFail(clientId, msg){
+  report.log({ level: 'error', message: `${await dd()} Failed to authenticate Client: ${clientId} because : ${msg}` });
+  updateRecord({metadata:'',stage:'auth_fail'},'accounts','accountId',clientId);
+}
 
-async function onDisconnect(reason, clientId){}
-
+async function onDisconnect(reason, clientId){
+  report.log({ level: 'error', message: `${await dd()} Client: ${clientId} disconnected because : ${reason}` });
+  updateRecord({metadata:'',stage:'disconnected'},'accounts','accountId',clientId);
+}
 
 class WhatsappSessionManager {
   sessionIdVsClientInstance = {};
@@ -72,7 +88,17 @@ class WhatsappSessionManager {
 
   createWAClient = (sessionId, proxy, useragent) => {
     //generate random user agent
-    return new WhatsappWebSession( qrReceived, clientReady, messageReceived, sessionId, proxy, useragent );
+    return new WhatsappWebSession( 
+        qrReceived,
+        clientReady,
+        messageReceived,
+        onAuthenticated,
+        onAuthFail,
+        onDisconnect,
+        sessionId,
+        proxy,
+        useragent 
+      );
   };
 
   async restorePreviousSessions() {

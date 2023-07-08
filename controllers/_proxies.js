@@ -2,13 +2,14 @@ const { insertRecord, updateRecord, select, delRecord } = require('../services/g
 const { response } = require('../services/helpersService');
 
 async function addProxy(req, res ){
-    console.log('test')
     try {
         const { url, username, password } = req.body;
 
         if(!url || !username || !password){
             return response(res, `Please provide all required fields` , false );
         }
+
+        req.body.status = 'active';
 
         const result = await insertRecord(req.body, 'proxies');
 
@@ -26,7 +27,7 @@ async function addProxy(req, res ){
 async function updateProxy(req, res ){
     try{
         const data = req.body;
-        const id = req.params.id;
+        const id = req.query.proxyid;
 
         if(!id){
             return response(res, `Please provide a valid proxy Id` , false );
@@ -47,7 +48,7 @@ async function updateProxy(req, res ){
 
 async function delProxy(req, res ){
     try{
-        const id = req.params.id;
+        const id = req.query.proxyid
 
         if(!id){
             return response(res, `Please provide a valid proxy Id` , false );

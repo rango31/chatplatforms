@@ -29,11 +29,16 @@ const selectPage = async (table, filter , currentPage, perPage ) => {
     return data;
 }
 
-const selectPageWhere = async (field, value,table, filter , currentPage, perPage ) => {
+const selectPageWhere = async ( whereFields, table, filter , currentPage, perPage ) => {
 
     const data = await knex(table)
         .select(filter)
-        .where({[field]: value})
+        .where((q) => {
+            whereFields.map((row)=> {
+              const {field, value} = row;
+              q.where(field, value);
+            })
+          })
         .paginate({
             perPage,
             currentPage,
