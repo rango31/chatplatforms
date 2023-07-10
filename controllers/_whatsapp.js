@@ -1,31 +1,37 @@
-const { selectWhere, insertRecord, updateRecord, select } = require('../services/generalDbService');
+const { selectWhere, insertRecord, updateRecord, select, delRecord } = require('../services/generalDbService');
 const singularWhatsappSessionManager = require('../services/whatsappSessionManager');
 const randUserAgent = require('random-useragent');
+const fs = require('fs');
 const { response } = require('../services/helpersService');
 
 async function authClient(req,res){
-    const id = req.query.id;
+    try{
+        const id = req.query.id;
 
-    const acc = await selectWhere([{field:'accountId', value: id}],'accounts','*');
+        const acc = await selectWhere([{field:'accountId', value: id}],'accounts','*');
 
-    if(acc.length > 0) { 
-        return await response(res, `Account ${id} already exists` , false )
+        if(acc.length > 0) { 
+            return await response(res, `Session ${id} already exists` , false )
+        }
+
+        const proxyId = null;
+        const ua = await randUserAgent.getRandom();
+
+        await insertRecord(
+            { 
+                service: 'WA',
+                stage: 'auth',
+                proxyId,
+                userAgent: ua
+            } ,'accounts');
+
+        await singularWhatsappSessionManager.createWAClient( id, null, ua );
+
+        return await response(res, `Account authentication initiated` , true )
+    }catch(ex){
+        report.log({ level: 'error', message: `${await dd()} ${ex}` });
+        return response(res, `A server error occured` , false )
     }
-
-    const proxyId = '';
-    const ua = await randUserAgent.getRandom();
-
-    await insertRecord(
-        { 
-            service: 'whatsapp',
-            stage: 'auth',
-            proxyId,
-            userAgent: ua
-        } ,'accounts');
-
-    await singularWhatsappSessionManager.createWAClient(id, '',ua);
-
-    return await response(res, `Account authentication initiated` , 200 )
 }
 
 async function getContacts(req, res){
@@ -56,13 +62,20 @@ async function connectionStatus(req, res){
 
 async function logout(req, res) {
     try{
-        const id = req.params.id;
-        const client = await singularWhatsappSessionManager.getSessionClient(id);
+        const id = req.query.id;
 
+        if(!id) { 
+            return await response(res, `Invalid Session: ${id}` , false )
+        }
+
+        const client = await singularWhatsappSessionManager.getSessionClient(id);
         await client.destroy();
-        //delete files
-        //make sure object is closed
-        report.log({ level: 'error', message: `${await dd()} Logging out account ${id}` });
+
+        fs.rmSync(`../sessions/${id}`, { recursive: true, force: true });
+
+        await delRecord('accounts', 'accountId', id);
+
+        report.log({ level: 'warn', message: `${await dd()} Logging out account ${id}` });
         return await response(res, `Client closed`, true )
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });
@@ -98,12 +111,14 @@ async function updateContacts(req, res){
         const id = req.query.id;
         const contacts = req.body.contacts;
 
+        //check if string;
+
         if(id && contacts){
-            const result = await updateRecord(contacts, 'accounts', 'accountId', id);
+            const result = await updateRecord({'contacts' : contacts}, 'accounts', 'accountId', id);
             return await response(res, `Contacts updated`, true );
 
         }else{
-            return response(res, `Please provide contacts object ` , false );
+            return response(res, `Please check your id and provided contacts` , false );
         }
 
     }catch(ex){
@@ -113,10 +128,36 @@ async function updateContacts(req, res){
 
 }
 
-async function restartClient(req, res) {
-    
+async function reconnectClient(req, res) {
+
     try{
         const id = req.query.id;
+
+        if(!id) { 
+            return await response(res, `Invalid Session: ${id}` , false )
+        }
+
+        const client = await singularWhatsappSessionManager.getSessionClient(id);
+        await client.destroy();
+        fs.rmSync(`../sessions/${id}`, { recursive: true, force: true });
+        await delRecord('accounts', 'accountId', id);
+
+        report.log({ level: 'warn', message: `${await dd()} Logging out account:${id}` });
+
+        const proxyId = null;
+        const ua = await randUserAgent.getRandom();
+
+        await insertRecord(
+            { 
+                service: 'WA',
+                stage: 'auth',
+                proxyId,
+                userAgent: ua
+            } ,'accounts');
+
+        await singularWhatsappSessionManager.createWAClient( id, null, ua );
+
+        return await response(res, `Account authentication initiated` , true )
 
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });
@@ -130,5 +171,6 @@ module.exports = {
     connectionStatus,
     poll,
     updateContacts,
-    logout
+    logout,
+    reconnectClient
 }

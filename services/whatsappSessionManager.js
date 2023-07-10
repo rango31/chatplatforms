@@ -104,8 +104,11 @@ class WhatsappSessionManager {
     const sessionIds = directoryNames.map(name => name.split("-")[1]);
 
     sessionIds.forEach((sessionId) => {
-      //get client proxy and useragent
-      this.createWAClient(sessionId, '', '');
+      
+     const session = selectWhere([{field:'accountId', value:sessionId}],'accounts', '*');
+     const { ua, proxy } = session;
+
+      this.createWAClient(sessionId,proxy, ua);
     });
   }
 }

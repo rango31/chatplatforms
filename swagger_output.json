@@ -14,9 +14,16 @@
     "/authclient": {
       "post": {
         "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -24,9 +31,16 @@
     "/getcontacts": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -35,8 +49,8 @@
       "get": {
         "description": "",
         "responses": {
-          "200": {
-            "description": "OK"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -55,6 +69,11 @@
       "put": {
         "description": "",
         "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
