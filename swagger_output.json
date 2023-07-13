@@ -45,6 +45,23 @@
         }
       }
     },
+    "/getchats": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/connectionstatus": {
       "get": {
         "description": "",

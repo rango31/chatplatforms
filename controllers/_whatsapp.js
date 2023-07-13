@@ -52,6 +52,19 @@ async function getContacts(req, res){
     }
 }
 
+async function getChats(req, res){
+    try{
+        const id = req.query.id;
+        const client = await singularWhatsappSessionManager.getSessionClient(id);
+        const chats = await client.getChats();
+
+        return await response(res, chats, true )
+    }catch(ex){
+        report.log({ level: 'error', message: `${await dd()} ${ex}` });
+        return response(res, `A server error occured` , false );
+    }
+}
+
 async function connectionStatus(req, res){
     try{
         const id = req.params.id;
@@ -196,6 +209,7 @@ async function savedContacts(req, res) {
 module.exports = {
     authClient,
     getContacts,
+    getChats,
     connectionStatus,
     poll,
     updateContacts,
