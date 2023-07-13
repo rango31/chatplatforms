@@ -7,16 +7,20 @@ chat platforms interfaces
 
   npm install --save
 
-     to setup db (Important this will create  the database and add the default user)
+     to setup db (Important this will automatically create the required database tables)
+     - create a mysql database with name  :'chatplatforms'
+     - edit the knexfile.js with your local mysql server credentials
+     - Best practice is to put the development creds in the dev category, and production creds in the production category.
+     - The sstem is currently running in development mode.
 
-  knex migrate:latest --env production  && knex seed:run --env pnroduction
+  knex migrate:latest --env development  && knex seed:run --env development
+     Not necessary as the system will run migrations automatically
+
 
     To run it, 
 
   npm start
    -- this will start the server
-   -- visit localhost:3000
+   -- visit localhost:3000/documentation/ to view documentation of API endpoints
    
-   default credentials(But i advise on registering a new account)
-   email: superuser@chatp.com - password : password321
 
