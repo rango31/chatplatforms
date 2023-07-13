@@ -22,5 +22,10 @@ chat platforms interfaces
   npm start
    -- this will start the server
    -- visit localhost:3000/documentation/ to view documentation of API endpoints
+
+
+   //todo
+   - implement cron job to delete uncompleted authentications.
+   - implement check to see if client is ready before interacting with it.
    
 
