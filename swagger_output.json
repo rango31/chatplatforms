@@ -72,6 +72,23 @@
         }
       }
     },
+    "/poll": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/savedcontacts": {
       "get": {
         "description": "",

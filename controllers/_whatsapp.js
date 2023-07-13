@@ -93,17 +93,16 @@ async function poll(req, res){
         const id = req.query.id;
 
         if(!id) { 
-            return await response(res, `Please provide a valid account Id` , false )
+            return await response(res, `Invalid Session Id` , false );
         }
 
-        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', 'accountId, metadata, stage, updatedAt');
+        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
 
         if(account.length < 1){
-            return await response(res, `Account not found` , false )
+            return await response(res, `No session found with ID: ${id}` , false )
         }
 
-        return await response(res, account[0] , false )
-
+        return await response(res, account[0] , true )
 
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });

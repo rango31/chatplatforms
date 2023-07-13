@@ -101,7 +101,7 @@ knex.migrate.latest()
         }
 
         report.log({ level: 'info', message: `${await dd()} Restoring previous Chat Sessions...` });
-        //singularWhatsappSessionManager.restorePreviousSessions();
+        singularWhatsappSessionManager.restorePreviousSessions();
 
         report.log({ level: 'info', message: `${await dd()} Setting up swagger docs. You can access them at http://localhost:3000/documentation/` });
         swaggerAutogen('./swagger_output.json', ['./routes/api.js'])
