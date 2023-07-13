@@ -103,12 +103,16 @@ class WhatsappSessionManager {
     );
     const sessionIds = directoryNames.map(name => name.split("-")[1]);
 
-    sessionIds.forEach((sessionId) => {
-      
-     const session = selectWhere([{field:'accountId', value:sessionId}],'accounts', '*');
-     const { ua, proxy } = session;
+    sessionIds.forEach(async (sessionId) => {
 
-      this.createWAClient(sessionId,proxy, ua);
+      if(!sessionId){
+        report.log({ level: 'error', message: `${await dd()} could not start session because of Invalid sessionId : ${sessionId}` });
+      }else{
+        const session = selectWhere([{field:'accountId', value:sessionId}],'accounts', '*');
+        const { ua, proxy } = session;
+   
+        this.createWAClient(sessionId,proxy, ua);
+      }
     });
   }
 }

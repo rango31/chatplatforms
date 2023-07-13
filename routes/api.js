@@ -7,7 +7,8 @@ const {
     getContacts,
     connectionStatus,
     logout,
-    updateContacts
+    updateContacts,
+    savedContacts
  } = require('../controllers/_whatsapp.js');
 
  const { 
@@ -22,6 +23,7 @@ router.post('/authclient', authClient);
 router.get('/getcontacts', getContacts);
 router.get('/connectionstatus', connectionStatus);
 router.get('/logout', logout);
+router.get('/savedcontacts', savedContacts);
 router.put('/updatecontacts', updateContacts);
 
 //proxy routes

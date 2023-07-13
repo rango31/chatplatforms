@@ -8,6 +8,7 @@ const winston = require('winston');
 const swaggerUi = require('swagger-ui-express')
 const swaggerAutogen = require('swagger-autogen')()
 const sf = require('./swagger_output.json');
+var fs = require('fs');
 
 const singularWhatsappSessionManager  = require('./services/whatsappSessionManager');
 const { dd } = require('./services/helpersService');
@@ -19,6 +20,7 @@ process.env.env = 'development';
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig['development'])
 global.knex = knex;
+global.dd = dd;
 
 global.report = winston.createLogger({
     level: 'info',
@@ -93,8 +95,13 @@ app.set('port', process.env.PORT || 3000);
 knex.migrate.latest()
     .then(async () => {
 
+        if (!fs.existsSync('./sessions')){
+            report.log({ level: 'info', message: `${await dd()} Sessions Folder not found, creating it...` });
+            fs.mkdirSync('./sessions');
+        }
+
         report.log({ level: 'info', message: `${await dd()} Restoring previous Chat Sessions...` });
-        singularWhatsappSessionManager.restorePreviousSessions();
+        //singularWhatsappSessionManager.restorePreviousSessions();
 
         report.log({ level: 'info', message: `${await dd()} Setting up swagger docs. You can access them at http://localhost:3000/documentation/` });
         swaggerAutogen('./swagger_output.json', ['./routes/api.js'])
@@ -106,7 +113,7 @@ knex.migrate.latest()
 
     }).catch(async (e)=>{
         report.log({ level: 'error', message: `${await dd()} ${e}` });
-        process.exit(1);
+        //process.exit(1);
     });
 
 

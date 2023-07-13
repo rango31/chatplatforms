@@ -29,7 +29,7 @@ class WhatsappWebSession {
       })
     });
 
-    this.client.options.userAgent = useragent;
+    // this.client.options.userAgent = useragent;
 
     this.client.on('qr', (qr) => {
       this.qr = qr;

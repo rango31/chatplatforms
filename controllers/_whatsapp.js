@@ -8,6 +8,10 @@ async function authClient(req,res){
     try{
         const id = req.query.id;
 
+        if(!id){
+            return await response(res, `Invalid Session Id` , false );
+        }
+
         const acc = await selectWhere([{field:'accountId', value: id}],'accounts','*');
 
         if(acc.length > 0) { 
@@ -19,13 +23,14 @@ async function authClient(req,res){
 
         await insertRecord(
             { 
+                accountId:id,
                 service: 'WA',
                 stage: 'auth',
                 proxyId,
                 userAgent: ua
             } ,'accounts');
 
-        await singularWhatsappSessionManager.createWAClient( id, null, ua );
+        singularWhatsappSessionManager.createWAClient( id, null, ua );
 
         return await response(res, `Account authentication initiated` , true )
     }catch(ex){
@@ -165,6 +170,30 @@ async function reconnectClient(req, res) {
     }
 }
 
+async function savedContacts(req, res) {
+    try{
+        const id = req.query.id;
+
+        if(!id){
+            return await response(res, `Invalid Session Id` , false );
+        }
+
+        const acc = await selectWhere([{field:'accountId', value: id}],'accounts','*');
+
+        if(acc.length < 1) { 
+            return await response(res, `No session found with ID: ${id}` , false )
+        }
+
+        const { contacts } = acc[0];
+
+        return await response( res, await JSON.parse(contacts) , true )
+
+    }catch(ex){
+        report.log({ level: 'error', message: `${await dd()} ${ex}` });
+        return response(res, `A server error occured` , false )
+    }
+}
+
 module.exports = {
     authClient,
     getContacts,
@@ -172,5 +201,6 @@ module.exports = {
     poll,
     updateContacts,
     logout,
-    reconnectClient
+    reconnectClient,
+    savedContacts
 }
