@@ -73,7 +73,7 @@
       }
     },
     "/logout": {
-      "get": {
+      "delete": {
         "description": "",
         "parameters": [
           {

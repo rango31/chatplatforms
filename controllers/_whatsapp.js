@@ -94,7 +94,7 @@ async function logout(req, res) {
         await delRecord('accounts', 'accountId', id);
 
         report.log({ level: 'warn', message: `${await dd()} Logging out account ${id}` });
-        return await response(res, `Client closed`, true )
+        return await response(res, `Client Removed`, true )
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });
         return response(res, `A server error occured` , false );

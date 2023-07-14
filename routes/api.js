@@ -25,7 +25,7 @@ router.post('/authclient', authClient);
 router.get('/getcontacts', getContacts);
 router.get('/getchats', getChats);
 router.get('/connectionstatus', connectionStatus);
-router.get('/logout', logout);
+router.delete('/logout', logout);
 router.get('/poll', poll);
 router.get('/savedcontacts', savedContacts);
 router.put('/updatecontacts', updateContacts);
