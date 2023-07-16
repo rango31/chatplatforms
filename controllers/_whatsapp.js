@@ -43,7 +43,9 @@ async function getContacts(req, res){
     try{
         const id = req.query.id;
         const client = await singularWhatsappSessionManager.getSessionClient(id);
+
         const contacts = await client.getContacts();
+       //
 
         return await response(res, contacts, true )
     }catch(ex){
@@ -67,7 +69,12 @@ async function getChats(req, res){
 
 async function connectionStatus(req, res){
     try{
-        const id = req.params.id;
+        const id = req.query.id;
+
+        if(!id) { 
+            return await response(res, `Invalid Session: ${id}` , false )
+        }
+
         const client = await singularWhatsappSessionManager.getSessionClient(id);
         const state = await client.getState();
 
@@ -87,13 +94,14 @@ async function logout(req, res) {
         }
 
         const client = await singularWhatsappSessionManager.getSessionClient(id);
+
         await client.destroy();
 
-        fs.rmSync(`../sessions/${id}`, { recursive: true, force: true });
+        fs.rmSync(`./sessions/session-${id}`, { recursive: true, force: true });
 
         await delRecord('accounts', 'accountId', id);
 
-        report.log({ level: 'warn', message: `${await dd()} Logging out account ${id}` });
+        report.log({ level: 'warn', message: `${await dd()} Logged out of Account ${id}` });
         return await response(res, `Client Removed`, true )
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });

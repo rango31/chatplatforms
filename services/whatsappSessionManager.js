@@ -30,6 +30,8 @@ async function clientReady(clientId, client){
 }
   
 async function messageReceived(msg, clientid){
+
+  console.log(msg.body)
   try{
     const account = await selectWhere([{field:'accountId', value:clientid}], 'accounts','*');
 
@@ -108,30 +110,49 @@ async function onDisconnect(reason, clientId){
 }
 
 class WhatsappSessionManager {
-  sessionIdVsClientInstance = {};
+  sessionIdVsClientInstance = [];
 
   constructor() {
-    this.sessionIdVsClientInstance = {};
+    this.sessionIdVsClientInstance = [];
     return this;
   }
 
-  getSessionClient  = (sessionId) => {
-    return this.sessionIdVsClientInstance[sessionId];
+  getSessionClient  = async (sessionId) => {
+   
+    let instances = this.sessionIdVsClientInstance;
+    let instance = await instances.filter((i)=>{ return i.id === sessionId});
+
+    if(instance.length > 0){
+      instance = instance[0]['instance'].client
+    }else{
+      instance = null
+    }
+
+    return instance
   };
 
   createWAClient = async (sessionId, proxy, useragent) => {
     try{
-      return new WhatsappWebSession( 
-          qrReceived,
-          clientReady,
-          messageReceived,
-          onAuthenticated,
-          onAuthFail,
-          onDisconnect,
-          sessionId,
-          proxy,
-          useragent 
-        );
+
+      const instance = new WhatsappWebSession( 
+        qrReceived,
+        clientReady,
+        messageReceived,
+        onAuthenticated,
+        onAuthFail,
+        onDisconnect,
+        sessionId,
+        proxy,
+        useragent 
+      );
+
+      this.sessionIdVsClientInstance.push({ 
+        id:sessionId,
+        instance
+      })
+
+      return instance
+
       }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });
       }
