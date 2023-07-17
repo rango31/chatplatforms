@@ -94,7 +94,7 @@ async function logout(req, res) {
         }
 
         const client = await singularWhatsappSessionManager.getSessionClient(id);
-
+        await client.logout();
         await client.destroy();
 
         fs.rmSync(`./sessions/session-${id}`, { recursive: true, force: true });
@@ -163,8 +163,9 @@ async function reconnectClient(req, res) {
         }
 
         const client = await singularWhatsappSessionManager.getSessionClient(id);
+        await client.logout();
         await client.destroy();
-        fs.rmSync(`../sessions/${id}`, { recursive: true, force: true });
+        fs.rmSync(`./sessions/${id}`, { recursive: true, force: true });
         await delRecord('accounts', 'accountId', id);
 
         report.log({ level: 'warn', message: `${await dd()} Logging out account:${id}` });
@@ -206,7 +207,7 @@ async function savedContacts(req, res) {
 
         const { contacts } = acc[0];
 
-        return await response( res, await JSON.parse(contacts) , true )
+        return await response( res, await JSON.parse(contacts ? contacts : []) , true )
 
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });

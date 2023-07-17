@@ -77,6 +77,11 @@ app.use(function(req, res){
 
 app.set('port', process.env.PORT || 3000);
 
+process.on('uncaughtException', async function(err) {
+    report.log({ level: 'error', message: `${await dd()} Fatal: ${err}` });
+    process.exit(1);
+});
+
 knex.migrate.latest()
     .then(async () => {
 
