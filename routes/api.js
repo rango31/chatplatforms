@@ -10,7 +10,8 @@ const {
     updateContacts,
     savedContacts,
     poll,
-    getChats
+    getChats,
+    reconnectClient
  } = require('../controllers/_whatsapp.js');
 
  const { 
@@ -25,6 +26,7 @@ router.post('/authclient', authClient);
 router.get('/getcontacts', getContacts);
 router.get('/getchats', getChats);
 router.get('/connectionstatus', connectionStatus);
+router.put('/reconnectclient', reconnectClient);
 router.delete('/logout', logout);
 router.get('/poll', poll);
 router.get('/savedcontacts', savedContacts);

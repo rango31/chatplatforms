@@ -79,6 +79,23 @@
         }
       }
     },
+    "/reconnectclient": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/logout": {
       "delete": {
         "description": "",

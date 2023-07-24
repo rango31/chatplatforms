@@ -25,7 +25,6 @@ global.dd = dd;
 global.report = winston.createLogger({
     level: 'info',
     format: winston.format.simple(),
-    // defaultMeta: { System: 'LocalyserScrapper'},
     transports: [
       new winston.transports.File({ filename: './logs/warn.log', level: 'warn' }),
       new winston.transports.File({ filename: './logs/error.log', level: 'error' }),
@@ -70,17 +69,19 @@ app.use('/documentation', swaggerUi.serve, swaggerUi.setup(sf))
 
 app.use(function(req, res){
     res.json({
-        "message":"404: Not found",
-         success:false
+        "message":"404 Not found",
+         "status":false
     })
 });
 
 app.set('port', process.env.PORT || 3000);
 
+/*
 process.on('uncaughtException', async function(err) {
     report.log({ level: 'error', message: `${await dd()} Fatal: ${err}` });
     process.exit(1);
 });
+*/
 
 knex.migrate.latest()
     .then(async () => {
@@ -103,7 +104,7 @@ knex.migrate.latest()
 
     }).catch(async (e)=>{
         report.log({ level: 'error', message: `${await dd()} ${e}` });
-        //process.exit(1);
+        process.exit(1);
     });
 
 

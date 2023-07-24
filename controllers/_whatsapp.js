@@ -13,22 +13,30 @@ async function authClient(req,res){
         }
 
         const acc = await selectWhere([{field:'accountId', value: id}],'accounts','*');
+        const dir = `./sessions/session-${id}`
 
-        if(acc.length > 0) { 
+        let proxyId;
+        let ua;
+
+        if(acc.length > 0 && fs.existsSync(dir)) { 
+           
             return await response(res, `Session ${id} already exists` , false )
         }
 
-        const proxyId = null;
-        const ua = await randUserAgent.getRandom();
-
-        await insertRecord(
-            { 
-                accountId:id,
-                service: 'WA',
-                stage: 'auth',
-                proxyId,
-                userAgent: ua
-            } ,'accounts');
+        if(!fs.existsSync && acc.length > 0){
+            await updateRecord({ stage: 'auth'},'accounts', 'accountId', id);
+        }else{
+            proxyId = null;
+            ua = await randUserAgent.getRandom();
+            await insertRecord(
+                { 
+                    accountId:id,
+                    service: 'WA',
+                    stage: 'auth',
+                    proxyId,
+                    userAgent: ua
+                } ,'accounts');
+        }
 
         singularWhatsappSessionManager.createWAClient( id, null, ua );
 
