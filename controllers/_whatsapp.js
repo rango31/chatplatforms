@@ -50,10 +50,20 @@ async function authClient(req,res){
 async function getContacts(req, res){
     try{
         const id = req.query.id;
+
+        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
+
+        if(account.length < 1){
+            return await response(res, `No session found with ID: ${id}` , false )
+        }
+
         const client = await singularWhatsappSessionManager.getSessionClient(id);
 
-        const contacts = await client.getContacts();
-       //
+        if(!client){
+            return await response(res, `Client with that Id was not found` , false )
+        }
+
+        const contacts = await client?.getContacts();
 
         return await response(res, contacts, true )
     }catch(ex){
@@ -65,8 +75,20 @@ async function getContacts(req, res){
 async function getChats(req, res){
     try{
         const id = req.query.id;
+
+        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
+
+        if(account.length < 1){
+            return await response(res, `No session found with ID: ${id}` , false )
+        }
+
         const client = await singularWhatsappSessionManager.getSessionClient(id);
-        const chats = await client.getChats();
+
+        if(!client){
+            return await response(res, `Client with that Id was not found` , false )
+        }
+
+        const chats = await client?.getChats();
 
         return await response(res, chats, true )
     }catch(ex){
@@ -83,8 +105,19 @@ async function connectionStatus(req, res){
             return await response(res, `Invalid Session: ${id}` , false )
         }
 
+        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
+
+        if(account.length < 1){
+            return await response(res, `No session found with ID: ${id}` , false )
+        }
+
         const client = await singularWhatsappSessionManager.getSessionClient(id);
-        const state = await client.getState();
+
+        if(!client){
+            return await response(res, `Client with that Id was not found` , false )
+        }
+
+        const state = await client?.getState();
 
         return await response(res, state, true )
     }catch(ex){
@@ -101,9 +134,25 @@ async function logout(req, res) {
             return await response(res, `Invalid Session: ${id}` , false )
         }
 
+        
+        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
+
+        if(account.length < 1){
+            return await response(res, `No session found with ID: ${id}` , false )
+        }
+
+        if(account?.stage !== 'complete'){
+            return await response(res, `Client: ${id} not ready, Please try again in a few minutes` , false )
+        }
+
         const client = await singularWhatsappSessionManager.getSessionClient(id);
-        await client.logout();
-        await client.destroy();
+
+        if(!client){
+            return await response(res, `Client with that Id was not found` , false )
+        }
+
+        await client?.logout();
+        await client?.destroy();
 
         fs.rmSync(`./sessions/session-${id}`, { recursive: true, force: true });
 
@@ -170,9 +219,20 @@ async function reconnectClient(req, res) {
             return await response(res, `Invalid Session: ${id}` , false )
         }
 
+        const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
+
+        if(account.length < 1){
+            return await response(res, `No session found with ID: ${id}` , false )
+        }
+
         const client = await singularWhatsappSessionManager.getSessionClient(id);
-        await client.logout();
-        await client.destroy();
+
+        if(!client){
+            return await response(res, `Client with that Id was not found` , false )
+        }
+
+        await client?.logout();
+        await client?.destroy();
         fs.rmSync(`./sessions/${id}`, { recursive: true, force: true });
         await delRecord('accounts', 'accountId', id);
 
@@ -213,9 +273,13 @@ async function savedContacts(req, res) {
             return await response(res, `No session found with ID: ${id}` , false )
         }
 
-        const { contacts } = acc[0];
+        let { contacts } = acc[0];
 
-        return await response( res, await JSON.parse(contacts ? contacts : []) , true )
+        if(!contacts){
+          contacts = "[]";
+        }
+
+        return await response( res, await JSON.parse(contacts) , true )
 
     }catch(ex){
         report.log({ level: 'error', message: `${await dd()} ${ex}` });

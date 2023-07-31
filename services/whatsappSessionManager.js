@@ -31,7 +31,6 @@ async function clientReady(clientId, client){
   
 async function messageReceived(msg, clientid){
 
-  console.log(msg.body)
   try{
     const account = await selectWhere([{field:'accountId', value:clientid}], 'accounts','*');
 
