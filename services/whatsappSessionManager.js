@@ -117,17 +117,22 @@ class WhatsappSessionManager {
   }
 
   getSessionClient  = async (sessionId) => {
+    try{
    
-    let instances = this.sessionIdVsClientInstance;
-    let instance = await instances.filter((i)=>{ return i.id === sessionId});
+      let instances = this.sessionIdVsClientInstance;
+      let instance = await instances.filter((i)=>{ return i.id === sessionId});
 
-    if(instance.length > 0){
-      instance = instance[0]['instance'].client
-    }else{
-      instance = null
+      if(instance.length > 0){
+        instance = instance[0]['instance']?.client
+      }else{
+        instance = null
+      }
+
+      return instance
+    }catch(ex){
+      report.log({ level: 'error', message: `apo${await dd()} ${ex}` });
+      return null
     }
-
-    return instance
   };
 
   createWAClient = async (sessionId, proxy, useragent) => {

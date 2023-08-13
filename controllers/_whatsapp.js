@@ -20,7 +20,7 @@ async function authClient(req,res){
 
         if(acc.length > 0 && fs.existsSync(dir)) { 
            
-            return await response(res, `Session ${id} already exists` , false )
+            return await response(res, `Session ${id} already exists. If you are having issues with your account, you can reconnect.` , false )
         }
 
         if(!fs.existsSync && acc.length > 0){
@@ -133,7 +133,6 @@ async function logout(req, res) {
         if(!id) { 
             return await response(res, `Invalid Session: ${id}` , false )
         }
-
         
         const account = await selectWhere([{field:'accountId',value:id}], 'accounts', ['accountId',' metadata','stage', 'updatedAt']);
 
@@ -141,7 +140,9 @@ async function logout(req, res) {
             return await response(res, `No session found with ID: ${id}` , false )
         }
 
-        if(account?.stage !== 'complete'){
+        const { stage } = account[0];
+
+        if(stage !== 'complete' && stage !== 'disconnected'){
             return await response(res, `Client: ${id} not ready, Please try again in a few minutes` , false )
         }
 
@@ -151,8 +152,12 @@ async function logout(req, res) {
             return await response(res, `Client with that Id was not found` , false )
         }
 
-        await client?.logout();
-        await client?.destroy();
+        try{
+            await client?.logout();
+            await client?.destroy();
+        }catch(ex){
+           report.log({ level: 'warn', message: `${await dd()} Could not connect to client because: ${ex.message}` });
+        }
 
         fs.rmSync(`./sessions/session-${id}`, { recursive: true, force: true });
 
@@ -231,8 +236,13 @@ async function reconnectClient(req, res) {
             return await response(res, `Client with that Id was not found` , false )
         }
 
-        await client?.logout();
-        await client?.destroy();
+        try{
+            await client?.logout();
+            await client?.destroy();
+        }catch(ex){
+           report.log({ level: 'warn', message: `${await dd()} Could not connect to client because: ${ex.message}` });
+        }
+
         fs.rmSync(`./sessions/${id}`, { recursive: true, force: true });
         await delRecord('accounts', 'accountId', id);
 
@@ -241,13 +251,18 @@ async function reconnectClient(req, res) {
         const proxyId = null;
         const ua = await randUserAgent.getRandom();
 
-        await insertRecord(
+        const result = await insertRecord(
             { 
+                accountId:id,
                 service: 'WA',
                 stage: 'auth',
                 proxyId,
                 userAgent: ua
             } ,'accounts');
+
+        if(!result){
+            return await response(res, `An error occured whilst creating client, Please Auth client to continue` , true )
+        }
 
         await singularWhatsappSessionManager.createWAClient( id, null, ua );
 
