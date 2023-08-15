@@ -19,11 +19,10 @@ async function authClient(req,res){
         let ua;
 
         if(acc.length > 0 && fs.existsSync(dir)) { 
-           
             return await response(res, `Session ${id} already exists. If you are having issues with your account, you can reconnect.` , false )
         }
 
-        if(!fs.existsSync && acc.length > 0){
+        if(!fs.existsSync(dir) && acc.length > 0){
             await updateRecord({ stage: 'auth'},'accounts', 'accountId', id);
         }else{
             proxyId = null;
@@ -152,6 +151,8 @@ async function logout(req, res) {
             return await response(res, `Client with that Id was not found` , false )
         }
 
+        await singularWhatsappSessionManager.removeInstance(id);
+
         try{
             await client?.logout();
             await client?.destroy();
@@ -235,6 +236,8 @@ async function reconnectClient(req, res) {
         if(!client){
             return await response(res, `Client with that Id was not found` , false )
         }
+
+        await singularWhatsappSessionManager.removeInstance(id);
 
         try{
             await client?.logout();

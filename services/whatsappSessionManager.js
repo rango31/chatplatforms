@@ -116,6 +116,21 @@ class WhatsappSessionManager {
     return this;
   }
 
+  removeInstance = async (sessionId) => {
+    try{
+   
+      const instances = this.sessionIdVsClientInstance;
+      const remainingInstances = await instances.filter((i)=>{ return i.id !== sessionId});
+      this.sessionIdVsClientInstance = remainingInstances;
+
+      return true;
+
+    }catch(ex){
+      report.log({ level: 'error', message: `apo${await dd()} ${ex}` });
+      return null
+    }
+  }
+
   getSessionClient  = async (sessionId) => {
     try{
    
